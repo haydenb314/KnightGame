@@ -1,6 +1,10 @@
 #include <iostream>
 #include "raylib.h"
 
+void playAnimation() {
+
+}
+
 int main() {
 
     InitWindow(1600, 900, "Knight Game");
@@ -8,43 +12,49 @@ int main() {
 
     Texture2D knightSheet = LoadTexture("CMakeFiles/knight_sheet.png");
 
-    //heights
+    //dimensions of a singular frame
     const float frameWidth = static_cast<float>(knightSheet.width) / 12;
     float frameHeight = static_cast<float>(knightSheet.height) / 30;
 
+    //flips knight animation when moving backwards
     float currentFrameWidth = frameWidth;
     float flippedFrameWidth = -frameWidth;
 
-    float attackHeight = 0;
-    float attack2Height = knightSheet.height - (frameHeight * 28);
-    float idleHeight = knightSheet.height - (frameHeight * 14);
-    float runHeight = knightSheet.height - (frameHeight * 10);
-
+    //timer
     float timer = 0.f;
 
     //frames
-    int frameAttack = 0;
-    int maxFramesAttack = 4;
+    int frame = 0;
+    int currentMaxFrames;
 
-    int frameAttack2 = 0;
-    int maxFramesAttack2 = 6;
+    //structure to hold animation max frames + rectangle
+    struct AnimationStruct {
+        float animationHeight;
+        int maxFrames;
+    };
 
-    int frameIdle = 0;
-    int maxFramesIdle = 10;
+    AnimationStruct attackAnimation;
+    attackAnimation.animationHeight = 0;
+    attackAnimation.maxFrames = 4;
 
-    int frameRun = 0;
-    int maxFramesRun = 10;
+    AnimationStruct attack2Animation;
+    attack2Animation.animationHeight = knightSheet.height - (frameHeight * 28);
+    attack2Animation.maxFrames = 6;
 
-    float frameAnimation = frameIdle;
-    float animationHeight = idleHeight;
+    AnimationStruct idleAnimation;
+    idleAnimation.animationHeight = knightSheet.height - (frameHeight * 14);
+    idleAnimation.maxFrames = 10;
 
+    AnimationStruct runAnimation;
+    runAnimation.animationHeight = knightSheet.height - (frameHeight * 10);
+    runAnimation.maxFrames = 10;
+
+    //source rectangle height
+    float currentAnimationHeight;
+
+    //position
     float currentX = 0;
     float currentY = 0;
-
-
-    float originX = frameWidth / 2;
-    float originY = frameHeight / 2;
-
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -55,22 +65,16 @@ int main() {
 
         if (timer >= 0.2f) {
             timer = 0.0f;
-            frameAttack += 1;
-            frameAttack2 += 1;
-            frameIdle += 1;
-            frameRun += 1;
+            frame += 1;
         }
 
-        frameAttack = frameAttack % maxFramesAttack;
-        frameAttack2 = frameAttack2 % maxFramesAttack2;
-        frameIdle = frameIdle % maxFramesIdle;
-        frameRun = frameRun % maxFramesRun;
+        frame = frame % currentMaxFrames;
 
 
         if (IsKeyDown(KEY_D)) {
             currentFrameWidth = frameWidth;
-            frameAnimation = frameRun;
-            animationHeight = runHeight;
+            currentAnimationHeight = runAnimation.animationHeight;
+            currentMaxFrames = runAnimation.maxFrames;
             if (IsKeyDown(KEY_LEFT_SHIFT)) {
                 currentX += 10;
             } else {
@@ -78,33 +82,31 @@ int main() {
             }
         } else if (IsKeyDown(KEY_A)) {
             currentFrameWidth = flippedFrameWidth;
-            frameAnimation = frameRun;
-            animationHeight = runHeight;
+            currentAnimationHeight = runAnimation.animationHeight;
+            currentMaxFrames = runAnimation.maxFrames;
             if (IsKeyDown(KEY_LEFT_SHIFT)) {
                 currentX -= 10;
             } else {
                 currentX -= 5;
             }
-        } else if (IsKeyPressed(KEY_G)) {
-            frameAnimation = frameAttack2;
-            animationHeight = attack2Height;
+        } else if (IsKeyDown(KEY_G)) {
+            currentAnimationHeight = attack2Animation.animationHeight;
+            currentMaxFrames = attack2Animation.maxFrames;
         } else if (IsKeyDown(KEY_H)) {
-            frameAnimation = frameAttack;
-            animationHeight = attackHeight;
+            currentAnimationHeight = attackAnimation.animationHeight;
+            currentMaxFrames = attackAnimation.maxFrames;
         } else {
-            frameAnimation = frameIdle;
-            animationHeight = idleHeight;
+            currentAnimationHeight = idleAnimation.animationHeight;
+            currentMaxFrames = idleAnimation.maxFrames;
         }
 
         DrawTexturePro(
             knightSheet,
-            Rectangle{ frameWidth * frameAnimation, animationHeight, currentFrameWidth, frameHeight },
+            Rectangle{ frameWidth * frame, currentAnimationHeight, currentFrameWidth, frameHeight },
             Rectangle{ currentX, currentY, frameWidth * 5, frameHeight * 5},
-            Vector2{originX, originY},
+            Vector2{frameWidth / 2, frameHeight / 2},
             0.f,
             WHITE);
-
-
 
         EndDrawing();
 
