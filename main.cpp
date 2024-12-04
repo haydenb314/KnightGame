@@ -22,10 +22,10 @@ int main() {
 
     //timer
     float timer = 0.f;
+    float timePerFrame = .12;
 
     //frames
     int frame = 0;
-    int currentMaxFrames;
 
     //structure to hold animation max frames + rectangle
     struct AnimationStruct {
@@ -33,6 +33,10 @@ int main() {
         int maxFrames;
     };
 
+    //holds current animation
+    AnimationStruct currentAnimation;
+
+    //animation structs
     AnimationStruct attackAnimation;
     attackAnimation.animationHeight = 0;
     attackAnimation.maxFrames = 4;
@@ -49,9 +53,6 @@ int main() {
     runAnimation.animationHeight = knightSheet.height - (frameHeight * 10);
     runAnimation.maxFrames = 10;
 
-    //source rectangle height
-    float currentAnimationHeight;
-
     //position
     float currentX = 0;
     float currentY = 0;
@@ -63,46 +64,48 @@ int main() {
 
         timer += GetFrameTime();
 
-        if (timer >= 0.2f) {
+        if (timer >= timePerFrame) {
             timer = 0.0f;
             frame += 1;
         }
 
-        frame = frame % currentMaxFrames;
+        frame = frame % currentAnimation.maxFrames;
 
 
         if (IsKeyDown(KEY_D)) {
             currentFrameWidth = frameWidth;
-            currentAnimationHeight = runAnimation.animationHeight;
-            currentMaxFrames = runAnimation.maxFrames;
+            currentAnimation = runAnimation;
             if (IsKeyDown(KEY_LEFT_SHIFT)) {
                 currentX += 10;
+                timePerFrame = .08;
             } else {
                 currentX += 5;
+                timePerFrame == .12;
             }
         } else if (IsKeyDown(KEY_A)) {
             currentFrameWidth = flippedFrameWidth;
-            currentAnimationHeight = runAnimation.animationHeight;
-            currentMaxFrames = runAnimation.maxFrames;
+            currentAnimation = runAnimation;
             if (IsKeyDown(KEY_LEFT_SHIFT)) {
                 currentX -= 10;
+                timePerFrame = .08;
             } else {
                 currentX -= 5;
+                timePerFrame = .12;
             }
         } else if (IsKeyDown(KEY_G)) {
-            currentAnimationHeight = attack2Animation.animationHeight;
-            currentMaxFrames = attack2Animation.maxFrames;
+            currentAnimation = attack2Animation;
+            timePerFrame = .12;
         } else if (IsKeyDown(KEY_H)) {
-            currentAnimationHeight = attackAnimation.animationHeight;
-            currentMaxFrames = attackAnimation.maxFrames;
+            currentAnimation = attackAnimation;
+            timePerFrame = .12;
         } else {
-            currentAnimationHeight = idleAnimation.animationHeight;
-            currentMaxFrames = idleAnimation.maxFrames;
+            currentAnimation = idleAnimation;
+            timePerFrame = .12;
         }
 
         DrawTexturePro(
             knightSheet,
-            Rectangle{ frameWidth * frame, currentAnimationHeight, currentFrameWidth, frameHeight },
+            Rectangle{ frameWidth * frame, currentAnimation.animationHeight, currentFrameWidth, frameHeight },
             Rectangle{ currentX, currentY, frameWidth * 5, frameHeight * 5},
             Vector2{frameWidth / 2, frameHeight / 2},
             0.f,
