@@ -49,13 +49,25 @@ int main() {
     idleAnimation.animationHeight = knightSheet.height - (frameHeight * 14);
     idleAnimation.maxFrames = 10;
 
+    AnimationStruct jumpAnimation;
+    jumpAnimation.animationHeight = knightSheet.height - (frameHeight * 13);
+    jumpAnimation.maxFrames = 3;
+
+    AnimationStruct crouch_walkAnimation;
+    crouch_walkAnimation.animationHeight = knightSheet.height - (frameHeight * 20);
+    crouch_walkAnimation.maxFrames = 8;
+
     AnimationStruct runAnimation;
     runAnimation.animationHeight = knightSheet.height - (frameHeight * 10);
     runAnimation.maxFrames = 10;
 
     //position
     float currentX = 0;
-    float currentY = 0;
+    float currentY = 300;
+
+    //jump physics
+    float gravity = 500;
+    float velocityY = 0;
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -71,6 +83,8 @@ int main() {
 
         frame = frame % currentAnimation.maxFrames;
 
+        velocityY += GetFrameTime() * gravity;
+        currentY += GetFrameTime() * velocityY;
 
         if (IsKeyDown(KEY_D)) {
             currentFrameWidth = frameWidth;
@@ -78,9 +92,13 @@ int main() {
             if (IsKeyDown(KEY_LEFT_SHIFT)) {
                 currentX += 10;
                 timePerFrame = .08;
+            } else if (IsKeyDown(KEY_S)) {
+                currentX += 4;
+                timePerFrame = .14;
+                currentAnimation = crouch_walkAnimation;
             } else {
                 currentX += 5;
-                timePerFrame == .12;
+                timePerFrame = .12;
             }
         } else if (IsKeyDown(KEY_A)) {
             currentFrameWidth = flippedFrameWidth;
@@ -88,10 +106,18 @@ int main() {
             if (IsKeyDown(KEY_LEFT_SHIFT)) {
                 currentX -= 10;
                 timePerFrame = .08;
+            } else if (IsKeyDown(KEY_S)) {
+                currentX -= 4;
+                timePerFrame = .14;
+                currentAnimation = crouch_walkAnimation;
             } else {
                 currentX -= 5;
                 timePerFrame = .12;
             }
+        } else if (IsKeyPressed(KEY_W)) {
+            velocityY = -300;
+            timePerFrame = .12;
+            currentAnimation = jumpAnimation;
         } else if (IsKeyDown(KEY_G)) {
             currentAnimation = attack2Animation;
             timePerFrame = .12;
@@ -101,6 +127,19 @@ int main() {
         } else {
             currentAnimation = idleAnimation;
             timePerFrame = .12;
+        }
+
+        //makes sure knight doesn't fall through floor
+        if (currentY >= 300) {
+            currentY = 300;
+        }
+
+        //keeps knight on screen by sending it to opposite side if offscreen
+        if (currentX >= 1600) {
+            currentX = -300;
+        }
+        if (currentX < -300) {
+            currentX = 1600;
         }
 
         DrawTexturePro(
