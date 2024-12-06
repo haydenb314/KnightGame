@@ -33,9 +33,6 @@ int main() {
         int maxFrames;
     };
 
-    //holds current animation
-    AnimationStruct currentAnimation;
-
     //animation structs
     AnimationStruct attackAnimation;
     attackAnimation.animationHeight = 0;
@@ -53,6 +50,10 @@ int main() {
     jumpAnimation.animationHeight = knightSheet.height - (frameHeight * 13);
     jumpAnimation.maxFrames = 3;
 
+    AnimationStruct crouchAnimation;
+    crouchAnimation.animationHeight = knightSheet.height - (frameHeight * 20);
+    crouchAnimation.maxFrames = 1;
+
     AnimationStruct crouch_walkAnimation;
     crouch_walkAnimation.animationHeight = knightSheet.height - (frameHeight * 20);
     crouch_walkAnimation.maxFrames = 8;
@@ -60,6 +61,10 @@ int main() {
     AnimationStruct runAnimation;
     runAnimation.animationHeight = knightSheet.height - (frameHeight * 10);
     runAnimation.maxFrames = 10;
+
+    //holds current animation
+    AnimationStruct currentAnimation;
+    currentAnimation.maxFrames = 10;
 
     //position
     float currentX = 0;
@@ -86,7 +91,11 @@ int main() {
         velocityY += GetFrameTime() * gravity;
         currentY += GetFrameTime() * velocityY;
 
-        if (IsKeyDown(KEY_D)) {
+        if (IsKeyPressed(KEY_W)) {
+            velocityY = -300;
+            timePerFrame = .12;
+            currentAnimation = jumpAnimation;
+        } else if (IsKeyDown(KEY_D)) {
             currentFrameWidth = frameWidth;
             currentAnimation = runAnimation;
             if (IsKeyDown(KEY_LEFT_SHIFT)) {
@@ -114,10 +123,8 @@ int main() {
                 currentX -= 5;
                 timePerFrame = .12;
             }
-        } else if (IsKeyPressed(KEY_W)) {
-            velocityY = -300;
-            timePerFrame = .12;
-            currentAnimation = jumpAnimation;
+        } else if (IsKeyDown(KEY_S)) {
+            currentAnimation = crouchAnimation;
         } else if (IsKeyDown(KEY_G)) {
             currentAnimation = attack2Animation;
             timePerFrame = .12;
