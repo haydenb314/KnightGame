@@ -10,7 +10,7 @@ int main() {
     InitWindow(1600, 900, "Knight Game");
     SetTargetFPS(60);
 
-    Texture2D knightSheet = LoadTexture("CMakeFiles/knight_sheet.png");
+    Texture2D knightSheet = LoadTexture("knight_sheet.png");
 
     //dimensions of a singular frame
     const float frameWidth = static_cast<float>(knightSheet.width) / 12;
